@@ -1,0 +1,92 @@
+@if (message()) {
+  <div class="card">
+    <p-message [severity]="message()?.severity" closable>{{ message()?.content }}</p-message>
+  </div>
+}
+
+<p-table
+  #dt1
+  [value]="users"
+  [globalFilterFields]="['name']"
+  [tableStyle]="{ 'min-width': '50rem', 'background': 'white' }"
+  [loading]="isLoading"
+  dataKey="id"
+  stripedRows
+  selectionMode="single"
+  loadingIcon="pi pi-spin pi-spinner"
+  [(selection)]="selectedProduct"
+  (onRowSelect)="onRowSelect($event)"
+
+>
+  <ng-template #caption>
+    <div class="card flex justify-center gap-2 flex-wrap">
+      <p-togglebutton [(ngModel)]="showSearch" onLabel="Hide" offLabel="Search" class="w-24"
+                      onIcon="pi pi-minus" offIcon="pi pi-plus" iconPos="right"
+      ></p-togglebutton>
+
+      @if (showSearch) {
+        <p-iconfield iconPosition="left">
+          <p-inputicon>
+            <i class="pi pi-search"></i>
+          </p-inputicon>
+
+          <input
+            pInputText
+            #tableSearchInput
+            type="text"
+            (input)="dt1.filterGlobal(tableSearchInput.value.trim(), 'contains')"
+            [(ngModel)]="search"
+            class="max-w-full"
+            placeholder="Search by name"
+          />
+        </p-iconfield>
+      }
+      <p-button label="Clear" [outlined]="true" icon="pi pi-filter-slash" (click)="dt1.clear(); search = ''"/>
+    </div>
+  </ng-template>
+
+  <ng-template #header>
+    <tr>
+      <th class="w-3-rem">Id</th>
+      <th class="w-10-rem md:min-w-max">Имя</th>
+      <th class="w-10-rem md:min-w-max">Email</th>
+      <th class="w-3-rem">
+        Активный
+        <p-columnFilter type="boolean" field="active" display="menu"/>
+      </th>
+    </tr>
+  </ng-template>
+
+  <ng-template #body let-user>
+    <tr [pSelectableRow]="user">
+      <td>
+        {{ user?.id }}
+      </td>
+
+      <td>
+        {{ user?.name }}
+      </td>
+
+      <td>
+        {{ user?.email }}
+      </td>
+
+      <td>
+        <i
+          class="pi"
+          [ngClass]="{
+                        'text-green-500 pi-check-circle': user.active,
+                        'text-red-500 pi-times-circle': !user.active
+                    }"
+        ></i>
+      </td>
+    </tr>
+  </ng-template>
+
+  <ng-template #emptymessage>
+    <tr>
+      <td colspan="4" class="font-medium">Пользователей не найдено</td>
+    </tr>
+  </ng-template>
+
+</p-table>
